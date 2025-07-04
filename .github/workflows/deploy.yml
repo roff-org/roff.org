@@ -1,0 +1,31 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    concurrency: ci-${{ github.ref }}
+
+    permissions:
+        contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up HTML directory
+        run: |
+          cp -rf static public/
+          echo "roff.org" > public/CNAME
+
+      - name: Deploy site
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: self
+          BRANCH: www
+          FOLDER: public
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
